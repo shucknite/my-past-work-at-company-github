@@ -1,0 +1,9 @@
+# ---
+# vars file for install_jenkins
+# ---
+# vars file for my_role
+---
+jenkins_user: "jenkins"
+jenkins_group: "jenkins"
+jenkins_port: 8080
+

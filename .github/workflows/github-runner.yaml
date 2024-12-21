@@ -1,0 +1,37 @@
+name: get ip
+
+on:
+
+  push:
+
+    branches: [ "my-job-interviews-projects-demo" ]
+
+jobs:
+
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+
+    - uses: actions/checkout@v3
+
+    # - name: Set up JDK 11
+    #   uses: actions/setup-java@v2
+    #   with:
+    #     distribution: 'adopt'
+    #     java-version: '11'
+    # - name: Build with Maven
+    #   run: mvn clean install -f github-runner/pom.xml
+
+    - name: Get Network Interface Details
+      run: ip addr show
+
+    - name: Get Network Interface Details
+      run: ip addr show
+
+    - name: Capture Runner IP
+      run: |
+        echo "Public IP: $(curl -s ifconfig.me)"
+        echo "Internal IP: $(hostname -I)"
+

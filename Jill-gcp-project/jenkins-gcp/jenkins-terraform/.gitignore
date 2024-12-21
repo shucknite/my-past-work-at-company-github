@@ -1,0 +1,7 @@
+credentials/credentials.json
+pruebas/*
+*.terraform
+*.tfstate
+*.tplan
+*.tfplan
+*.tfstate

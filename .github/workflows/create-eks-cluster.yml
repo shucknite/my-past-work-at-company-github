@@ -1,0 +1,42 @@
+# name: github-action-eks-create
+# # run-name: ${{ github.actor }} has triggered the pipeline
+
+# on:
+#   push:
+#     branches:
+#       - 'my-job-interviews-projects-demo'
+
+# env:
+#   AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+#   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#   AWS Region: us-east-1
+
+# jobs:
+#   build-infra:
+#     name: create-eks 
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v2
+#       - name: Set up Terraform
+#         uses: hashicorp/setup-terraform@v2
+#       - name: Terraform Init
+#         id: init
+#         run: terraform init 
+#         working-directory:  github-action/terraform2
+#       - name: Terraform Validate
+#         id: validate
+#         run: terraform validate
+#         working-directory:  github-action/terraform2
+#       - name: Terraform Plan
+#         id: plan
+#         run: terraform plan
+#         working-directory:  github-action/terraform2
+#       - name: Terraform Apply
+#         id: apply
+#         run: terraform apply --auto-approve
+#         working-directory: github-action/eks
+#       # - name: Terraform destroy
+#       #   id: destroy
+#       #   run: terraform destroy --auto-approve
+#       #   working-directory: github-action/terraform

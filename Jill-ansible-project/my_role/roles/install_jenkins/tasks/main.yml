@@ -1,0 +1,35 @@
+# ---
+# tasks file for install_jenkins
+# ---
+# tasks file for my_role
+---
+- name: Ensure apt cache is up-to-date
+  apt:
+    update_cache: yes
+
+- name: Install Java
+  apt:
+    name: "{{ jenkins_java_package }}"
+    state: present
+
+- name: Add Jenkins repository key
+  apt_key:
+    url: "{{ jenkins_repo_url }}"
+    state: present
+
+- name: Add Jenkins repository
+  apt_repository:
+    repo: "deb http://pkg.jenkins.io/debian-stable binary/"
+    state: present
+
+- name: Install Jenkins
+  apt:
+    name: "{{ jenkins_package }}"
+    state: present
+
+- name: Ensure Jenkins is started and enabled
+  service:
+    name: "{{ jenkins_package }}"
+    state: started
+    enabled: yes
+

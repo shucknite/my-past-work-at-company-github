@@ -1,0 +1,4 @@
+ansible-playbook -i inventory.yaml jenkins.yaml
+
+ansible-playbook -i  aws_ec2.yaml test-playbook.yaml --private-key=/home/shucknite/.ansible/inventory/my-key-pair.pem --user ec2-user
+

@@ -1,0 +1,5 @@
+i have two gcp account 
+
+i need to create a service account in order to grant permissions to different resource
+
+we need to add the json file with the gcp keys for it to recognise the s3 bucket backend

@@ -1,0 +1,20 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      # - dir = "app_directory" # Specify the working directory relative to the repo root
+      - "-t"
+      - "docker.io/shucknite/gcp-codebuild:latest"
+      - "."
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "push"
+      - "docker.io/shucknite/gcp-codebuild:latest"
+images:
+  - "docker.io/shucknite/gcp-codebuild:latest"
+
+
+
+                                  #  build all using just terraform this code below
+
+  

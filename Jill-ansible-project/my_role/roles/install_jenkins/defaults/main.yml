@@ -1,0 +1,10 @@
+# ---
+# defaults file for install_jenkins
+---
+# defaults file for my_role
+
+jenkins_package: jenkins
+jenkins_repo_url: https://pkg.jenkins.io/debian-stable/jenkins.io.key
+jenkins_java_package: openjdk-11-jdk
+
+

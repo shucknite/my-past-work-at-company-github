@@ -1,0 +1,11 @@
+# ---
+# handlers file for install_jenkins
+# ---
+# handlers file for my_role
+---
+- name: Restart Jenkins
+  service:
+    name: jenkins
+    state: restarted
+
+

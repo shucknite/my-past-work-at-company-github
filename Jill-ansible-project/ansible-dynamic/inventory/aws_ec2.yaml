@@ -1,0 +1,33 @@
+# plugin: amazon.aws.aws_ec2
+# regions:
+#   - us-east-1
+# keyed_groups:
+#   - key: tags.Name
+#     separator: ""
+#   - key: instance_state
+# filters:
+#   instance-state-name: running
+# compose:
+#   ansible_host: public_ip_address
+
+# ---
+# plugin: aws_ec2
+# regions:
+#   - us-east-1
+# filters:
+#   tag:Env:
+#     - dev
+
+plugin: aws_ec2
+regions:
+  - us-east-1
+filters:
+  tag:Env: dev
+keyed_groups:
+  - key: tags.Name
+    prefix: instance
+host_key_checking: false
+ansible_user: ubuntu
+# private-key=~/virginia.pem
+ansible_ssh_private_key_file: ~ /virginia.pem
+

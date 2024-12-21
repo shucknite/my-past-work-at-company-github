@@ -1,0 +1,65 @@
+# ---
+# - name: Install Nginx
+#   hosts: all
+#   become: yes
+#   tasks:
+#     - name: Install Nginx
+#       apt:
+#         name: nginx
+#         state: present
+
+#     - name: Ensure the SSH private key has the correct permissions
+#       file:
+#         path: /path/to/your/private/key
+#         mode: '0400'
+#         owner: your_user
+#         group: your_group
+
+#     - name: Create AWS credentials file
+#       copy:
+#         dest: /home/your_user/.aws/credentials
+#         content: |
+#           [default]
+#           aws_access_key_id = YOUR_ACCESS_KEY_ID
+#           aws_secret_access_key = YOUR_SECRET_ACCESS_KEYv
+
+---
+- name: Install Nginx on AWS EC2 Instances
+  hosts: all
+  vars_files:
+    - ansible-vault/ansible-vault.yml
+  tasks:
+    - name: Create AWS credentials file
+      copy:
+        dest: ~/.aws/credentials
+        content: |
+          [default]
+          aws_access_key_id = {{ aws_access_key }}
+          aws_secret_access_key = {{ aws_secret_key }}
+      when: ansible_user == 'ec2-user'
+
+    # - name: Add SSH private key
+    #   copy:
+    #     dest: ~/.ssh/id_rsa
+    #     content: "{{ ssh_private_key }}"
+    #     mode: '0400'
+
+    # - name: Clone Git repository
+    #   git:
+    #     repo: https://{{ git_token }}@github.com/your-repo/your-project.git
+    #     dest: /tmp/your-project
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    # - name: Install Nginx
+    #   apt:
+    #     name: nginx=1.24.0-2ubuntu7.1
+    #     state: present
+
+    # - name: Install Git
+    #   apt:
+    #     name: git
+    #     state: present

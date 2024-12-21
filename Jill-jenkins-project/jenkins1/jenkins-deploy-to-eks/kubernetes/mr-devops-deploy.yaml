@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mr-devops-deployment
+spec:
+  selector:
+    matchLabels:
+      app: mr-devops-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mr-devops-deployment
+    spec:
+      containers:
+      - name: mr-devops-deployment
+        image: shucknite/mr-devops:latest
+        ports:
+        - containerPort: 9090
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mr-devops-svc
+  labels:
+    app: mr-devops-svc
+spec:
+  ports:
+  - name: http
+    port: 9090
+    protocol: TCP
+    targetPort: 9090
+  selector:
+    app: mr-devops-svc
+  type: LoadBalancer
+
+  # note the service loadbalancer will create a aws load balancer in the aws console and 
+  # then you can copy the aws load balancer dns and go to route 53 and configure it to your desire domain name 

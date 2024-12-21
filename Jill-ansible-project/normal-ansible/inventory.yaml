@@ -1,0 +1,24 @@
+all:
+  hosts:
+    server1:
+      ansible_host: 3.86.146.19
+      ansible_user: ec2-user
+      ansible_ssh_private_key_file: ~/virginia.pem
+
+    # server2:
+    #   ansible_host: 44.211.160.226
+    #   ansible_user: ubuntu
+    #   ansible_ssh_private_key_file: ~/virginia.pem
+
+
+    # server3:
+    #   ansible_host: 192.168.1.103
+    #   ansible_user: admin
+    #   ansible_ssh_private_key_file: /path/to/key3.pem
+
+    # ansible_ssh_private_key_file=~/virginia.pem
+
+    # Host demo2
+    # HostName 20.172.32.242
+    # User azureuser
+    # IdentityFile ~/.ssh/azure_demo2_rsa

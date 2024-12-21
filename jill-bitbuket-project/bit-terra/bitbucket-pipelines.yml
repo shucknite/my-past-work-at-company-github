@@ -1,0 +1,50 @@
+# image: hashicorp/terraform:latest
+
+# pipelines:
+#   default:
+#     - step:
+#         name: Terraform Plan and Apply
+#         caches:
+#           - terraform
+#         script:
+#           - apt-get update && apt-get install -y unzip
+#           - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+#           - unzip awscliv2.zip
+#           - sudo ./aws/install
+#           - aws --version
+#           - cd terraform # Navigate to the working directory
+#           - terraform init
+#           - terraform plan -out=tfplan
+#           - terraform apply -auto-approve tfplan
+# definitions:
+#   caches:
+#     terraform: terraform/.terraform
+
+
+image: hashicorp/terraform:latest
+
+pipelines:
+  default:
+    - step:
+        name: Terraform Init & Apply
+        script:
+          # Install AWS CLI using Alpine Package Manager
+          - apk add --no-cache aws-cli
+
+          # Verify AWS CLI installation
+          - aws --version
+
+          # Initialize Terraform
+          - cd terraform
+          - terraform init
+
+          # Run Terraform Plan (Optional for review)
+          - terraform plan 
+
+          # Apply the Terraform Configuration
+          - terraform apply -auto-approve 
+
+
+
+
+

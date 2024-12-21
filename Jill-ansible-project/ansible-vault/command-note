@@ -1,0 +1,214 @@
+1. Install Ansible Vault
+Ensure you have Ansible installed, as it includes the Vault feature:
+
+bash
+Copy code
+sudo apt install ansible
+2. Create a Vault File
+To create a new encrypted file:
+
+bash
+Copy code
+
+ansible-vault create secrets.yml
+
+It will prompt you to enter a password. This password will be required to access the vault file later.
+
+3. Add Sensitive Data
+In the secrets.yml, structure the data like this:
+
+yaml
+Copy code
+aws_access_key: YOUR_AWS_ACCESS_KEY
+aws_secret_key: YOUR_AWS_SECRET_KEY
+ssh_private_key: |
+  -----BEGIN RSA PRIVATE KEY-----
+  ...
+  -----END RSA PRIVATE KEY-----
+git_username: YOUR_GIT_USERNAME
+git_password: YOUR_GIT_PASSWORD
+Save and exit.
+
+4. Encrypt an Existing File
+If you already have a file, encrypt it with:
+
+bash
+Copy code
+
+ansible-vault encrypt secrets.yml
+
+5. Decrypt the File
+To view or edit the encrypted file:
+
+bash
+Copy code
+
+ansible-vault edit secrets.yml
+
+Or to decrypt it temporarily:
+
+bash
+Copy code
+
+ansible-vault view secrets.yml
+
+6. Use Vault Data in a Playbook
+You can reference variables stored in the vault in your playbooks:
+
+yaml
+Copy code
+- name: Deploy with sensitive data
+  hosts: all
+  vars_files:
+    - secrets.yml
+  tasks:
+    - name: Use AWS credentials
+      debug:
+        msg: "AWS Access Key is {{ aws_access_key }}"
+
+    - name: Save SSH private key
+      copy:
+        content: "{{ ssh_private_key }}"
+        dest: /root/.ssh/id_rsa
+        mode: '0600'
+7. Automating Vault Password Retrieval
+You can store the vault password in a file to avoid manual entry. For example:
+
+Create a password file:
+
+bash
+Copy code
+echo 'your_vault_password' > vault_password.txt
+Use it when running commands:
+
+bash
+Copy code
+
+ansible-playbook playbook.yml --vault-password-file vault_password.txt
+
+8. Store Vault Password Securely
+Option 1: Restrict access to the password file:
+bash
+Copy code
+
+chmod 600 vault_password.txt
+
+Option 2: Use an environment variable:
+bash
+Copy code
+
+export ANSIBLE_VAULT_PASSWORD_FILE=path/to/vault_password.txt
+
+9. Encrypt and Manage Vault with Git
+To store and use Ansible Vault with Git:
+
+Commit the secrets.yml file after encryption:
+bash
+Copy code
+git add secrets.yml
+git commit -m "Add encrypted secrets"
+git push
+
+10. add this to your playbook
+    
+  - name: Use AWS, SSH, and Git Credentials
+  hosts: localhost
+  vars_files:
+    - credentials.yml
+  tasks:
+    - name: Configure AWS CLI
+      ansible.builtin.shell: |
+        aws configure set aws_access_key_id {{ aws.access_key }}
+        aws configure set aws_secret_access_key {{ aws.secret_key }}
+        aws configure set region {{ aws.region }}
+    
+    - name: Add SSH Key for Git
+      ansible.builtin.copy:
+        content: "{{ ssh_keys.private_key }}"
+        dest: ~/.ssh/id_rsa
+        mode: '0600'
+
+    - name: Clone a Git Repository
+      ansible.builtin.git:
+        repo: https://github.com/YOUR_REPO_NAME.git
+        dest: /path/to/clone
+        version: main
+        username: "{{ git.username }}"
+        password: "{{ git.token }}"
+
+                           getting the identifier
+
+1. What is a Vault Identifier?
+A vault identifier is a label added to an encrypted file to specify which vault key should decrypt it. This label is specified using the --vault-id option.
+
+Example of a vault identifier:
+
+yaml
+Copy code
+
+$ANSIBLE_VAULT;1.1;AES256;my_vault_id
+
+In this case, my_vault_id is the vault identifier.
+
+2. Adding a Vault Identifier
+When creating or editing a vault-encrypted file, you can include a vault identifier:
+
+Create an Encrypted File with a Vault ID:
+bash
+Copy code
+
+ansible-vault create --vault-id my_vault_id@prompt secrets.yml
+my_vault_id is the identifier.
+
+@prompt indicates you’ll be prompted to input the password for this vault.
+Edit an Encrypted File with a Vault ID:
+bash
+Copy code
+ansible-vault edit --vault-id my_vault_id@prompt secrets.yml
+3. View Vault Identifier in an Encrypted File
+You can see the vault identifier at the top of an encrypted file. For example:
+
+bash
+Copy code
+
+cat secrets.yml
+The file will look like:
+
+yaml
+Copy code
+$ANSIBLE_VAULT;1.1;AES256;my_vault_id
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+The string my_vault_id is the identifier.
+
+4. Using Vault Identifiers in Playbooks
+When using files encrypted with a specific vault identifier, you must reference the correct vault ID and key in your Ansible commands or configurations.
+
+Run a Playbook with Vault Identifier:
+bash
+Copy code
+ansible-playbook --vault-id my_vault_id@prompt site.yml
+You can also use a file containing the vault password:
+
+bash
+Copy code
+ansible-playbook --vault-id my_vault_id@/path/to/password_file site.yml
+5. Multiple Vault Identifiers
+Ansible supports using multiple vault identifiers when working with files encrypted with different keys. You can specify multiple --vault-id options in your commands:
+
+bash
+Copy code
+ansible-playbook --vault-id dev_vault@/path/to/dev_password \
+                 --vault-id prod_vault@/path/to/prod_password site.yml
+This ensures that Ansible uses the correct key for each vault.
+
+6. Setting Vault Identifiers in ansible.cfg
+You can configure vault identifiers in your ansible.cfg file for easier management:
+
+ini
+Copy code
+[defaults]
+vault_identity_list = dev_vault@/path/to/dev_password, prod_vault@/path/to/prod_password
+This way, you don’t need to specify the --vault-id option every time you run a playbook.
+
+

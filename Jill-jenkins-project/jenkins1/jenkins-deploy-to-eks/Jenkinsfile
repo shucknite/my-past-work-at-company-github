@@ -1,0 +1,152 @@
+pipeline{
+    
+    agent any 
+  
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION = "us-east-1"
+    }
+    
+    stages {
+        
+        stage('Git Checkout'){
+            
+            steps{
+                
+                script{
+                    git branch: 'my-job-interview-projects-demo', credentialsId: 'jenkins-git-auth', url: 'https://github.com/shucknite/my-job-interview-projects-demo.git'
+                }
+                
+                dir('Jenkins\kubernestes-jenkins')
+            }
+        }
+        stage('UNIT testing'){
+            
+            steps{
+                
+                script{
+                    
+                    sh 'mvn test'
+                }
+            }
+        }
+        
+        stage('Integration testing'){
+            
+            steps{
+                
+                script{
+                    
+                    sh 'mvn verify -DskipUnitTests'
+                }
+            }
+        }
+        stage('Maven build'){
+            
+            steps{
+                
+                script{
+                    
+                    sh 'mvn clean install'
+                }
+            }
+        }
+        stage('Static code analysis'){
+            
+            steps{
+                
+                script{
+                    
+                    withSonarQubeEnv(credentialsId: 'sonar-api') {
+                        
+                        sh 'mvn clean package sonar:sonar'
+                    }
+                   }
+                    
+                }
+            }
+            stage('Quality Gate Status'){
+                
+                steps{
+                    
+                    script{
+                        
+                        waitForQualityGate abortPipeline: false, credentialsId: 'sonar-api'
+                    }
+                }
+            }
+
+            // stage('upload war file to nexus'){
+
+            //     steps{
+            //         script{
+            //             def readPomVersion = readMavenPom file: 'pom.xml'
+
+            //             def nexusRepo = readPomVersion.version.endsWith("SHAPSHOT") ? "demoapp-snapshot" : "nexus-jenkins"
+
+            //             nexusArtifactUploader artifacts: [[artifactId: 'springboot', classifier: '', file: 'target/Uber.jar', type: 'jar']], 
+            //             credentialsId: 'nexus-jenkins', groupId: 'com.example', nexusUrl: '172.26.48.37:8081', nexusVersion: 'nexus3', protocol: 'http', 
+            //             repository: 'nexus-jenkins', version: "1.0.1"
+            //         }
+            //     }
+            // }
+
+            stage('Docker Image Build'){
+
+                steps{
+                    script{
+                        sh 'docker build -t mr-devops .'
+                        sh 'docker tag mr-devops shucknite/mr-devops'
+                    }
+                }
+            }
+
+            stage('Docker Push Image '){
+
+                steps{
+                    script{
+                       withCredentials([string(credentialsId: 'dockerpwd', variable: 'dockerpwd')]) {
+                        sh 'docker login -u shucknite -p ${dockerpwd}'
+                 }
+                        sh 'docker push  shucknite/mr-devops'
+
+                    }
+                }
+            }
+
+            // stage('Remove Docker Images'){
+
+            //     steps{
+            //         script{
+            //            sh 'docker rmi shucknite/mr-devops'
+
+            //         }
+            //     }
+            // }
+
+            stage('Deploy to EKS') {
+            steps {
+                script {
+                    dir('Jenkins\kubernestes-jenkins\kubernetes') {
+                        sh 'aws eks update-kubeconfig --name mr-devops-eks-cluster2 --region us-east-1'
+
+                        sh 'kubectl apply -f mr-devops-deploy.yaml'
+                    }
+                }
+            }
+        }
+
+        // stage("Slack Message") {
+        //     steps {
+        //         script {
+        //             sh "slackSend channel: 'mr-devops', color: 'blue', message: 'pass', teamDomain: 'mr-devopsworkspace', tokenCredentialId: 'slack-jenkins'"
+        //         }
+        //     }
+        // }
+
+        }
+    }
+        
+
+

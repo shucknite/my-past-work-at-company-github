@@ -1,0 +1,11 @@
+# [all]
+# target_host ansible_host=3.86.146.19 ansible_user=ec2-user ansible_ssh_private_key_file=~/virginia.pem
+# target_host ansible_host=54.166.91.10 ansible_user=ubuntu ansible_ssh_private_key_file=~/virginia.pem
+
+all:
+  hosts:
+    server1:
+      ansible_host: 3.86.146.19
+      ansible_user: ec2-user
+      ansible_ssh_private_key_file: ~/virginia.pem
+
